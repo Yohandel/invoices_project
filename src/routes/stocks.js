@@ -1,5 +1,6 @@
 const express = require('express');
 const Stock = require('../models/stock');
+const Product = require('../models/product');
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -13,6 +14,7 @@ router.get('/inStock', (req, res) => {
         }).catch((err) => {
             console.log(err);
         });
+        
 })
 
 router.get('/inStock/:id', (req, res) => {
@@ -27,13 +29,22 @@ router.get('/inStock/:id', (req, res) => {
 })
 
 router.post('/addStock', (req, res) => {
-    const stock = new Stock({ ...req.body, status: true });
-    stock.save()
-        .then((result) => {
-            res.send(result)
-        }).catch((err) => {
-            console.log(err);
-        });
+    Stock.exists({ product: req.body.product }, (err, doc) => {
+        if (doc) {
+            res.send('Ya existe este producto')
+        }
+
+        else {
+
+            const stock = new Stock({ ...req.body, status: true });
+            stock.save()
+                .then((result) => {
+                    res.send(result)
+                }).catch((err) => {
+                    console.log(err);
+                });
+        }
+    })
 })
 
 router.put('/updateStock/:id', (req, res) => {
