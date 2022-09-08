@@ -6,7 +6,7 @@ app.use(express.json());
 const router = new express.Router()
 
 router.get('/products', (req, res) => {
-    Product.find().sort({ createdAt: -1 })
+    Product.find({status: true}).sort({ createdAt: -1 })
         .then((result) => {
             res.send(result)
         }).catch((err) => {

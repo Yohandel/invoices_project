@@ -7,14 +7,14 @@ app.use(express.json());
 const router = new express.Router();
 
 router.get('/inStock', (req, res) => {
-    Stock.find().sort({ createdAt: -1 }).
+    Stock.find({status:true}).sort({ createdAt: -1 }).
         populate('product', 'description')
         .then((result) => {
             res.send(result)
         }).catch((err) => {
             console.log(err);
         });
-        
+
 })
 
 router.get('/inStock/:id', (req, res) => {
@@ -36,15 +36,27 @@ router.post('/addStock', (req, res) => {
 
         else {
 
+            const id = req.body.product
             const stock = new Stock({ ...req.body, status: true });
             stock.save()
                 .then((result) => {
-                    res.send(result)
+                    Stock.findOne({ product: id }).sort({ createdAt: -1 }).
+                        populate('product', 'description')
+                        .then((result) => {
+                            res.send(result)
+                        }).catch((err) => {
+                            console.log(err);
+                        });
                 }).catch((err) => {
                     console.log(err);
                 });
+
+
         }
+
     })
+
+
 })
 
 router.put('/updateStock/:id', (req, res) => {
